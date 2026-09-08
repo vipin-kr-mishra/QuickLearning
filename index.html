@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QuickLearning — Interview Q&amp;A</title>
+<meta name="description" content="A fast, searchable reference of C#, ASP.NET MVC and LINQ interview questions with interview-ready answers.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%237c3aed'/%3E%3Ctext x='16' y='23' font-family='Segoe UI,system-ui,sans-serif' font-size='19' font-weight='700' fill='white' text-anchor='middle'%3EQ%3C/text%3E%3C/svg%3E">
+
+<link rel="stylesheet" href="assets/css/theme.css">
+<link rel="stylesheet" href="assets/css/layout.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="assets/css/print.css" media="print">
+
+<script>
+  /* Apply the saved theme before first paint so there is no flash. */
+  (function () {
+    try {
+      var s = JSON.parse(localStorage.getItem("ql.v1") || "{}");
+      if (s.theme === "light" || s.theme === "dark") {
+        document.documentElement.setAttribute("data-theme", s.theme);
+      }
+    } catch (e) { /* storage blocked — fall back to the system theme */ }
+  })();
+</script>
+</head>
+<body>
+
+<a class="skip-link" href="#view">Skip to content</a>
+
+<div class="app">
+
+  <header class="topbar">
+    <button type="button" id="menuBtn" class="btn btn--icon btn--ghost menu-btn" aria-label="Open navigation"></button>
+
+    <a class="brand" href="#/" aria-label="QuickLearning home">
+      <span class="brand__mark" aria-hidden="true">QL</span>
+      <span class="brand__text">
+        <span class="brand__title">QuickLearning</span>
+        <span class="brand__sub">Interview Q&amp;A</span>
+      </span>
+    </a>
+
+    <div class="topbar__search" id="searchWrap">
+      <div class="searchbox" id="searchBox">
+        <span class="searchbox__icon" id="searchIcon" aria-hidden="true"></span>
+        <input id="searchInput" class="searchbox__input" type="text" role="searchbox"
+               placeholder="Search questions and answers…" autocomplete="off"
+               spellcheck="false" aria-label="Search questions and answers">
+        <span class="searchbox__hint" aria-hidden="true"><kbd>Ctrl</kbd><kbd>K</kbd></span>
+        <button type="button" id="clearBtn" class="btn btn--icon btn--sm btn--ghost searchbox__clear" aria-label="Clear search"></button>
+      </div>
+      <div class="search-panel" id="searchPanel" role="listbox" aria-label="Search results" hidden></div>
+    </div>
+
+    <span class="topbar__spacer"></span>
+
+    <div class="topbar__actions">
+      <button type="button" id="flashBtn" class="btn btn--icon" aria-pressed="false" title="Flashcard mode  (F)" aria-label="Flashcard mode"></button>
+      <button type="button" id="printBtn" class="btn btn--icon hide-xs" title="Print this page" aria-label="Print"></button>
+      <button type="button" id="helpBtn" class="btn btn--icon hide-xs" title="Keyboard shortcuts  (?)" aria-label="Keyboard shortcuts"></button>
+      <button type="button" id="themeBtn" class="btn btn--icon" title="Toggle theme  (T)" aria-label="Toggle theme"></button>
+    </div>
+  </header>
+
+  <aside class="sidebar" id="sidebar" aria-label="Sections"></aside>
+
+  <main class="content" id="content">
+    <div class="view" id="view" tabindex="-1"></div>
+  </main>
+
+</div>
+
+<div class="scrim" id="scrim" aria-hidden="true"></div>
+<div id="modal" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- Core. store.js defines QL.register, so it must load before any data file. -->
+<script src="assets/js/store.js"></script>
+<script src="assets/js/highlight.js"></script>
+<script src="assets/js/render.js"></script>
+<script src="assets/js/search.js"></script>
+<script src="assets/js/router.js"></script>
+
+<!-- Content. Classic scripts, not modules or fetch, so file:// works too. -->
+<script src="data/manifest.js"></script>
+<script src="data/csharp-basic.js"></script>
+<script src="data/csharp-intermediate.js"></script>
+<script src="data/csharp-advanced.js"></script>
+<script src="data/mvc-basic.js"></script>
+<script src="data/mvc-intermediate.js"></script>
+<script src="data/mvc-advanced.js"></script>
+<script src="data/linq.js"></script>
+
+<!-- Boots once every section is registered. -->
+<script src="assets/js/app.js"></script>
+
+</body>
+</html>

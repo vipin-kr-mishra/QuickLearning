@@ -1,0 +1,172 @@
+/* ==========================================================================
+   QuickLearning — print / PDF stylesheet (linked with media="print")
+   Expands every answer, drops the app chrome, forces a light document.
+   ========================================================================== */
+
+@page {
+  size: A4;
+  margin: 16mm 14mm 18mm;
+}
+
+html, body {
+  background: #fff !important;
+  background-image: none !important;
+  color: #000 !important;
+  font-size: 10.5pt;
+  line-height: 1.5;
+}
+
+/* Force the light palette regardless of the on-screen theme */
+:root, :root[data-theme="dark"], :root[data-theme="light"] {
+  --surface: #fff;
+  --surface-2: #fff;
+  --surface-3: #fff;
+  --surface-hover: #fff;
+  --code-bg: #fff;
+  --border: #c8c8c8;
+  --border-strong: #9a9a9a;
+  --text: #000;
+  --text-2: #1a1a1a;
+  --text-muted: #444;
+  --text-faint: #666;
+  --tone: #000;
+  --syn-key: #000;
+  --syn-type: #000;
+  --syn-str: #000;
+  --syn-num: #000;
+  --syn-com: #555;
+  --syn-attr: #000;
+  --syn-pre: #555;
+  --syn-punc: #000;
+  --mark-bg: #f0f0f0;
+  --mark-fg: #000;
+  --tip-bg: #fff;
+  --warn-bg: #fff;
+  --tip-bd: #000;
+  --warn-bd: #000;
+}
+
+/* Chrome we never print */
+.brand,
+.topbar,
+.sidebar,
+.scrim,
+.search-panel,
+.toolbar,
+.qcard__tools,
+.qcard__chevron,
+.qcard__reveal,
+.codeblock__bar,
+.modal-scrim,
+.toast,
+.skip-link,
+.section-nav,
+.home-hero__actions,
+.btn,
+.chip { display: none !important; }
+
+/* Shell collapses to a single flowing column */
+.app {
+  display: block !important;
+  min-height: 0 !important;
+}
+.content { padding: 0 !important; }
+.view { max-width: none !important; margin: 0 !important; }
+
+.page-head { margin-bottom: 10mm; padding-bottom: 3mm; border-bottom: 1.5pt solid #000; }
+.page-head__title { font-size: 19pt; }
+.page-head__crumbs { font-size: 8.5pt; }
+
+/* Every answer opens, regardless of screen state */
+.qcard__wrap { display: block !important; grid-template-rows: none !important; }
+.qcard__clip { overflow: visible !important; }
+.qcard__tldr { display: block !important; }
+body.flashcard .qcard .qcard__tldr { display: block !important; }
+body.flashcard .qcard.is-open:not(.is-revealed) .qcard__wrap { grid-template-rows: none !important; }
+
+.qlist { display: block !important; gap: 0 !important; }
+
+.qcard {
+  break-inside: avoid;
+  page-break-inside: avoid;
+  border: 0 !important;
+  border-bottom: .5pt solid #ccc !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin: 0 0 4mm !important;
+  padding-bottom: 3mm;
+}
+.qcard__head { padding: 0 0 2mm !important; }
+.qcard__body { padding: 0 0 0 10mm !important; }
+.qcard__num {
+  background: none !important;
+  color: #000 !important;
+  min-width: 0;
+  padding: 0;
+  justify-content: flex-start;
+  font-size: 10pt;
+}
+.qcard__q { font-size: 11.5pt; font-weight: 700; }
+.qcard__tldr { font-size: 10pt; color: #333 !important; font-style: italic; }
+
+.answer { font-size: 10pt; }
+.answer__tldr {
+  border: 0 !important;
+  border-left: 2pt solid #000 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  padding: 1mm 0 1mm 3mm !important;
+}
+.answer__tldr-key { color: #000 !important; }
+
+.ans-note {
+  background: none !important;
+  border-left: 1.5pt solid #666 !important;
+  border-radius: 0 !important;
+  padding: 1mm 0 1mm 3mm !important;
+}
+.ans-note__icon { display: none !important; }
+
+.codeblock {
+  border: .5pt solid #999 !important;
+  border-radius: 2pt !important;
+  background: #fafafa !important;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+.codeblock pre { font-size: 8.5pt; line-height: 1.42; padding: 2.5mm 3mm; white-space: pre-wrap; }
+.codeblock pre code { white-space: pre-wrap; }
+.t-key { font-weight: 700; }
+.t-com { font-style: italic; }
+
+.ans-table-wrap { overflow: visible !important; border-color: #999 !important; break-inside: avoid; }
+.ans-table th { background: #f0f0f0 !important; }
+.ans-table th, .ans-table td { border-color: #ccc !important; }
+
+.badge {
+  border: .5pt solid #999 !important;
+  background: none !important;
+  color: #333 !important;
+}
+
+/* Home dashboard, when "Print all" starts from there */
+.home-hero { border: 0 !important; box-shadow: none !important; padding: 0 0 6mm !important; }
+.home-hero::before { display: none !important; }
+.topic-grid { display: none !important; }
+.ring-wrap, .pbar, .stat { display: none !important; }
+
+.print-section-title {
+  break-before: page;
+  page-break-before: always;
+  font-size: 15pt;
+  margin: 0 0 5mm;
+  padding-bottom: 2mm;
+  border-bottom: 1pt solid #000;
+}
+.print-section-title:first-of-type { break-before: auto; page-break-before: auto; }
+
+a { color: #000 !important; text-decoration: none !important; }
+
+/* "Print everything" swaps the live view for the pre-rendered full document. */
+body.printing-all #view { display: none !important; }
+body.printing-all .print-only { display: block !important; }
