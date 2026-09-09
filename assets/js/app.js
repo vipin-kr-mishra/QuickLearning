@@ -812,8 +812,8 @@
 
     document.addEventListener("click", function (e) {
       if (!el.panel.hidden && !e.target.closest("#searchWrap")) closeSearch();
-      if (e.target.closest('[data-act="close-modal"]') === e.target.closest(".modal-scrim") &&
-          e.target.closest('[data-act="close-modal"]')) closeModal();
+      var closer = e.target.closest('[data-act="close-modal"]');
+      if (closer && (!closer.classList.contains("modal-scrim") || !e.target.closest(".modal"))) closeModal();
     });
 
     el.themeBtn.addEventListener("click", toggleTheme);
