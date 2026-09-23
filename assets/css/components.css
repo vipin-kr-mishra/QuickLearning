@@ -352,6 +352,8 @@
 .qcard__main { flex: 1 1 auto; min-width: 0; }
 /* These are spans (a button may not contain block elements), so blockify them. */
 .qcard__q, .qcard__tldr { display: block; }
+/* Buttons block text selection by default; let people copy the question. */
+.qcard__main { -webkit-user-select: text; user-select: text; }
 .qcard__q {
   font-size: 14.5px;
   font-weight: 600;
