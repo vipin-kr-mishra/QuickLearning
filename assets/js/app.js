@@ -224,6 +224,7 @@
           '<span class="qcard__chevron">' + icon("chevron", 17, "") + "</span>" +
         "</button>" +
         '<div class="qcard__tools">' +
+          '<button type="button" class="tool-btn" data-act="copy-q" title="Copy question" aria-label="Copy question">' + icon("copy", 15, "") + "</button>" +
           '<button type="button" class="tool-btn' + (starred ? " is-on" : "") + '" data-act="star" title="Star  (S)" aria-pressed="' + starred + '">' + icon("star", 16, "") + "</button>" +
           '<button type="button" class="tool-btn' + (learned ? " is-on" : "") + '" data-act="learn" title="Mark learned  (L)" aria-pressed="' + learned + '">' + icon("check", 16, "") + "</button>" +
         "</div>" +
@@ -553,16 +554,17 @@
   /* Clipboard                                                              */
   /* ===================================================================== */
 
-  function copyText(text) {
+  function copyText(text, what) {
+    what = what || "Code";
     if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(text).then(function () { toast("Code copied"); },
-        function () { legacyCopy(text); });
+      navigator.clipboard.writeText(text).then(function () { toast(what + " copied"); },
+        function () { legacyCopy(text, what); });
     } else {
-      legacyCopy(text);
+      legacyCopy(text, what);
     }
   }
 
-  function legacyCopy(text) {
+  function legacyCopy(text, what) {
     var ta = document.createElement("textarea");
     ta.value = text;
     ta.setAttribute("readonly", "");
@@ -572,7 +574,7 @@
     var ok = false;
     try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
     document.body.removeChild(ta);
-    toast(ok ? "Code copied" : "Copy failed — select the code manually");
+    toast(ok ? what + " copied" : "Copy failed — select the text manually");
   }
 
   /* ===================================================================== */
@@ -634,6 +636,7 @@
     if (act) {
       var name = act.getAttribute("data-act");
       var card = act.closest(".qcard");
+      if (name === "copy-q" && card) return copyText($(".qcard__q", card).textContent, "Question");
       if (name === "star" && card) return toggleStar(card);
       if (name === "learn" && card) return toggleLearn(card);
       if (name === "reveal" && card) {
@@ -655,6 +658,9 @@
 
     var head = e.target.closest(".qcard__head");
     if (head) {
+      // Finishing a text selection inside the header should not toggle the card.
+      var sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed && head.contains(sel.anchorNode)) return;
       var c2 = head.closest(".qcard");
       toggleCard(c2);
       var list = visibleCards();
