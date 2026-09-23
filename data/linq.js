@@ -5,62 +5,64 @@ QL.register({
   level: "Core",
   short: "LINQ",
   accent: "teal",
-  desc: "Querying collections and databases: execution semantics, the operators that matter, and the IEnumerable/IQueryable distinction that decides where your query actually runs.",
+  desc: "Querying lists and databases in C#: when a query actually runs, the operators you use every day, and the IEnumerable vs IQueryable difference that decides whether filtering happens in the database or in memory.",
   questions: [
 
     {
       id: "what-is-linq",
       q: "What is LINQ, and how does it improve data querying in C#?",
-      tldr: "Language Integrated Query — a uniform, strongly typed set of query operators built into C#, usable over objects, databases and XML with the same syntax.",
+      tldr: "LINQ (Language Integrated Query) lets you filter, sort and shape data using normal C# code — and the same style works for lists, databases and XML.",
       tags: ["fundamentals"],
       seeAlso: ["csharp-basic/linq-intro", "linq/ienumerable-vs-iqueryable"],
       a: [
+        { p: "Before LINQ, you wrote a `foreach` loop with `if` checks for lists, and a SQL string for the database. LINQ gives you **one way to write queries** for both." },
         { ul: [
-          "**One syntax, many sources** — LINQ to Objects, LINQ to Entities (EF), LINQ to XML, LINQ to JSON via providers.",
-          "**Compile-time checking and IntelliSense.** A typo in a SQL string fails at runtime; a typo in a LINQ query fails at build.",
-          "**Declarative** — you say *what* you want, not how to loop. Filtering, grouping and ordering read in one chain.",
-          "**Composable** — build a query in pieces and combine them, because nothing executes until you enumerate.",
-          "**Refactor-safe** — renaming a property updates the query; a SQL string silently rots."
+          "**Same syntax everywhere** — works on lists (LINQ to Objects), databases via Entity Framework (LINQ to Entities) and XML (LINQ to XML).",
+          "**Errors show up at compile time.** A typo in a SQL string only fails when the app runs. A typo in LINQ fails when you build.",
+          "**IntelliSense helps you** — Visual Studio suggests property names as you type.",
+          "**Short and readable** — you say *what* you want (\"orders over 100, sorted by name\"), not *how* to loop through them.",
+          "**Safe to rename** — if you rename a property, the query updates too. A SQL string would silently break."
         ] },
-        { code: `// Without LINQ
+        { code: `// Without LINQ — a manual loop
 var result = new List<string>();
 foreach (var o in orders)
     if (o.Total > 100 && o.Status == Status.Shipped)
         result.Add(o.Reference);
 result.Sort();
 
-// With LINQ
+// With LINQ — one readable chain
 var result = orders
     .Where(o => o.Total > 100 && o.Status == Status.Shipped)
     .OrderBy(o => o.Reference)
     .Select(o => o.Reference)
     .ToList();`, lang: "csharp" },
-        { p: "LINQ rests on four C# features added specifically for it: **extension methods**, **lambda expressions**, **anonymous types** and **expression trees**." },
-        { note: "The honest caveat worth mentioning: LINQ to Objects is slightly slower than a hand-written loop (delegate calls and iterator allocations), and against a database a careless query can generate terrible SQL. Readability usually wins, but you should know where to look when it does not.", kind: "tip" }
+        { p: "LINQ is built on four C# features: **extension methods** (like `.Where()`), **lambda expressions** (like `o => o.Total > 100`), **anonymous types** (like `new { o.Name }`) and **expression trees** (which let EF turn your C# into SQL)." },
+        { note: "A good honest point to add in an interview: LINQ on a list is a tiny bit slower than a hand-written loop, and a badly written LINQ query against a database can produce slow SQL. But in most code, the readability is worth it.", kind: "tip" }
       ]
     },
 
     {
       id: "deferred-vs-immediate-execution",
       q: "Explain the difference between deferred execution and immediate execution in LINQ.",
-      tldr: "Deferred means the query is only a recipe until you enumerate it; immediate means an operator runs the query and returns a concrete result right away.",
+      tldr: "Deferred means the query does not run when you write it — it runs later, when you loop over it or call ToList. Immediate means it runs right away and gives you the result.",
       tags: ["execution"],
       a: [
+        { p: "Think of a deferred query as a **recipe**: writing it down does not cook anything. Cooking happens only when you actually ask for the food (loop over it or call `ToList()`)." },
         { table: { head: ["", "Deferred", "Immediate"], rows: [
-          ["Runs", "When enumerated (`foreach`, `ToList`)", "At the call"],
-          ["Returns", "`IEnumerable<T>` / `IQueryable<T>`", "A value or a materialised collection"],
-          ["Operators", "`Where`, `Select`, `OrderBy`, `Take`, `Skip`, `GroupBy`, `Join`", "`ToList`, `ToArray`, `ToDictionary`, `Count`, `Sum`, `First`, `Any`, `Max`"],
-          ["Re-enumerating", "**Runs the query again**", "Reuses the stored result"]
+          ["When it runs", "Later — when you loop over it or call `ToList()`", "Right away"],
+          ["What you get back", "A query (`IEnumerable<T>` / `IQueryable<T>`)", "A real value or a filled list"],
+          ["Examples", "`Where`, `Select`, `OrderBy`, `Take`, `Skip`, `GroupBy`, `Join`", "`ToList`, `ToArray`, `ToDictionary`, `Count`, `Sum`, `First`, `Any`, `Max`"],
+          ["Loop over it twice?", "**It runs again** each time", "Uses the result it already has"]
         ] } },
-        { code: `var query = numbers.Where(n => n > 2);   // nothing has run yet
+        { code: `var query = numbers.Where(n => n > 2);   // nothing runs yet — just a recipe
 
-numbers.Add(10);                        // the source changed...
+numbers.Add(10);                        // we change the list...
 
-foreach (var n in query) { }            // ...and 10 IS included — runs now
+foreach (var n in query) { }            // ...runs NOW, so 10 IS included
 
 var list = numbers.Where(n => n > 2).ToList();   // runs immediately
-numbers.Add(20);                                  // list is unaffected`, lang: "csharp" },
-        { p: "**Why deferred execution is good:** you can compose a query in stages, and only the final shape is executed — so a database only ever sees one optimised statement." },
+numbers.Add(20);                                  // list does not change`, lang: "csharp" },
+        { p: "**Why deferred is useful:** you can build a query step by step, and it only runs once at the end. With a database, that means **one SQL query** with all your filters." },
         { code: `IQueryable<Order> q = _db.Orders;
 
 if (from.HasValue) q = q.Where(o => o.CreatedOn >= from);
@@ -68,70 +70,71 @@ if (status != null) q = q.Where(o => o.Status == status);
 
 var page = q.OrderBy(o => o.CreatedOn)
             .Skip(skip).Take(size)
-            .ToList();          // ONE SQL query, with all the filters applied`, lang: "csharp" },
-        { note: "The two traps. **Multiple enumeration**: iterating a deferred query twice runs it twice — twice the database round trips. **Captured variables**: the lambda reads the variable's value *at execution time*, not at definition time, which surprises people inside loops. `ToList()` at the point you are done composing fixes both.", kind: "warn" }
+            .ToList();          // runs here — ONE SQL query with all filters`, lang: "csharp" },
+        { note: "Two common mistakes. **1) Looping twice** over a deferred query runs it twice — two database calls instead of one. **2) Changing a variable** used inside the query before it runs — the query uses the value at the time it runs, not when you wrote it. Calling `ToList()` once you are done building the query fixes both.", kind: "warn" }
       ]
     },
 
     {
       id: "select-vs-selectmany",
       q: "What is the difference between Select and SelectMany in LINQ? Provide examples.",
-      tldr: "Select maps each element to one result, producing a sequence of sequences when the result is a collection; SelectMany maps and then flattens into a single sequence.",
+      tldr: "Select gives one result for each item. If that result is a list, you end up with a list of lists. SelectMany does the same but flattens everything into one single list.",
       tags: ["operators", "projection"],
       a: [
+        { p: "Simple example: each author has a list of books. `Select` gives you **a list of book-lists**. `SelectMany` gives you **one list of all books**." },
         { code: `var authors = new[]
 {
     new Author { Name = "Ada",  Books = new[] { "A1", "A2" } },
     new Author { Name = "Brian", Books = new[] { "B1" } }
 };
 
-// Select: one result per author -> a sequence OF SEQUENCES
+// Select: one result per author -> a list of lists
 IEnumerable<string[]> nested = authors.Select(a => a.Books);
-// [ ["A1","A2"], ["B1"] ]  -- needs a nested loop to read
+// [ ["A1","A2"], ["B1"] ]  -- you need two loops to read this
 
-// SelectMany: flattened into ONE sequence
+// SelectMany: everything in ONE flat list
 IEnumerable<string> flat = authors.SelectMany(a => a.Books);
 // [ "A1", "A2", "B1" ]`, lang: "csharp" },
-        { p: "`SelectMany` also has an overload that keeps the parent, which is what you almost always want:" },
+        { p: "`SelectMany` can also keep the parent (the author) next to each child (the book), which is very common:" },
         { code: `var pairs = authors.SelectMany(
-    a => a.Books,                                  // the collection selector
-    (author, book) => new { author.Name, Book = book });   // the result selector
+    a => a.Books,                                          // which list to flatten
+    (author, book) => new { author.Name, Book = book });   // what to return for each
 
 // { Name = "Ada", Book = "A1" }
 // { Name = "Ada", Book = "A2" }
 // { Name = "Brian", Book = "B1" }`, lang: "csharp" },
-        { code: `// Query syntax: a second "from" IS SelectMany
+        { code: `// In query syntax, a second "from" means SelectMany
 var pairs2 = from a in authors
              from b in a.Books
              select new { a.Name, Book = b };
 
-// Real-world: every line of every order over 100
+// Real-world: all order lines from orders over 100
 var lines = orders.Where(o => o.Total > 100)
                   .SelectMany(o => o.Lines)
                   .ToList();`, lang: "csharp" },
         { table: { head: ["", "`Select`", "`SelectMany`"], rows: [
-          ["Result count", "Same as the source", "Sum of the inner collection sizes"],
-          ["Result shape", "`IEnumerable<TResult>` (may be nested)", "Flat `IEnumerable<TResult>`"],
+          ["Number of results", "Same as the number of items", "Total of all the inner lists"],
+          ["Shape", "Can be a list of lists", "Always one flat list"],
           ["Query syntax", "`select`", "A second `from`"],
-          ["Use when", "One-to-one mapping", "One-to-many, and you want them flattened"]
+          ["Use when", "One item → one result", "One item → many results, and you want them in one list"]
         ] } },
-        { note: "`SelectMany` skips empty inner collections entirely — an author with no books contributes nothing. If you need them kept, that is a `GroupJoin` / left join, not `SelectMany`.", kind: "warn" }
+        { note: "If an author has no books, `SelectMany` simply leaves them out. If you need to keep them, you want a left join (`GroupJoin` + `DefaultIfEmpty`), not `SelectMany`.", kind: "warn" }
       ]
     },
 
     {
       id: "where-clause",
       q: "How do you use LINQ to filter data with the Where clause?",
-      tldr: "Where takes a predicate and returns the elements that satisfy it, lazily — and multiple Where calls compose into a single AND.",
+      tldr: "Where takes a condition and keeps only the items that match it. You can chain several Where calls, and they work like AND.",
       tags: ["operators", "filtering"],
       a: [
         { code: `var adults = people.Where(p => p.Age >= 18);
 
-// Chained Where calls are ANDed together
+// Two Where calls = AND
 var target = people.Where(p => p.Age >= 18)
                    .Where(p => p.City == "Pune");
 
-// Equivalent in one predicate
+// Same thing in one condition
 var target2 = people.Where(p => p.Age >= 18 && p.City == "Pune");
 
 // Query syntax
@@ -139,9 +142,9 @@ var target3 = from p in people
               where p.Age >= 18 && p.City == "Pune"
               select p;
 
-// The index overload — LINQ to Objects only
+// With the item's position (index) — works on lists only, not EF
 var everyOther = people.Where((p, index) => index % 2 == 0);`, lang: "csharp" },
-        { p: "**Conditional filtering** is where deferred execution pays off — build the query up, execute once:" },
+        { p: "**Adding filters only when needed** is a very common real-world pattern — for example, a search page where the user may or may not fill each box:" },
         { code: `IQueryable<Product> q = _db.Products;
 
 if (!string.IsNullOrWhiteSpace(search))
@@ -153,36 +156,36 @@ if (categoryId.HasValue)
 if (inStockOnly)
     q = q.Where(p => p.Stock > 0);
 
-var results = q.OrderBy(p => p.Name).Take(50).ToList();   // one query`, lang: "csharp" },
+var results = q.OrderBy(p => p.Name).Take(50).ToList();   // one SQL query`, lang: "csharp" },
         { ul: [
-          "`Where` is **deferred** — nothing runs until enumeration.",
-          "**Filter before you project and before you sort.** Sorting a filtered set is cheaper, and against a database it changes the generated SQL.",
-          "**`Where(...).FirstOrDefault()`** and `FirstOrDefault(predicate)` are equivalent; the second reads better.",
-          "Related operators: `OfType<T>()` filters by type, `Distinct()` removes duplicates, `Any(predicate)` just tests existence.",
-          "Prefer **`Any()` over `Count() > 0`** — `Any` stops at the first match, `Count` walks everything."
+          "`Where` is **deferred** — it does not run until you loop over it or call `ToList()`.",
+          "**Filter first, then sort or select.** Sorting fewer items is faster, and with a database it gives better SQL.",
+          "`Where(x => ...).FirstOrDefault()` and `FirstOrDefault(x => ...)` do the same thing — the second is shorter.",
+          "Related: `OfType<T>()` keeps items of a certain type, `Distinct()` removes duplicates, `Any(x => ...)` just checks if at least one matches.",
+          "Use **`Any()` instead of `Count() > 0`** — `Any` stops as soon as it finds one match, while `Count` checks every item."
         ] },
-        { note: "Against EF, only what the provider can translate reaches SQL. Calling your own C# method inside `Where` either throws or silently pulls the whole table into memory first — check the generated SQL when a query is slow.", kind: "warn" }
+        { note: "With Entity Framework, your condition must be something EF can turn into SQL. If you call your own C# method inside `Where`, EF will either throw an error or load the whole table into memory first. If a query is slow, check the SQL it produces.", kind: "warn" }
       ]
     },
 
     {
       id: "ienumerable-vs-iqueryable",
       q: "Explain the difference between IEnumerable<T> and IQueryable<T> in the context of LINQ.",
-      tldr: "IEnumerable executes in memory with delegates; IQueryable builds an expression tree that a provider translates — so the filtering happens in the database instead of in your process.",
+      tldr: "IEnumerable filters data in memory, inside your app. IQueryable turns the query into SQL, so the database does the filtering and sends back only the rows you need.",
       tags: ["execution", "performance"],
       seeAlso: ["csharp-advanced/expression-trees", "linq/deferred-vs-immediate-execution"],
       a: [
+        { p: "Easy way to explain it: with **IEnumerable**, you bring all the data home and then pick what you want. With **IQueryable**, you tell the database what you want, and it sends only that." },
         { table: { head: ["", "`IEnumerable<T>`", "`IQueryable<T>`"], rows: [
           ["Namespace", "`System.Collections.Generic`", "`System.Linq`"],
-          ["Predicate is a", "`Func<T, bool>` — compiled code", "`Expression<Func<T, bool>>` — a tree"],
-          ["Executes", "**In memory**, in your process", "**At the source** — translated to SQL"],
-          ["Best for", "In-memory collections", "Remote data: EF, OData"],
-          ["Custom C# in the predicate", "Anything", "Only what the provider can translate"],
-          ["Extra round trips", "N/A", "Composable into one query"]
+          ["Where the filtering happens", "**In memory**, in your app", "**In the database** — converted to SQL"],
+          ["How it works", "Runs your lambda as normal C# code", "Reads your lambda as data (an expression tree) and turns it into SQL"],
+          ["Best for", "Lists and arrays already in memory", "Databases (Entity Framework), remote data"],
+          ["Custom C# methods in the query", "Anything works", "Only what EF can turn into SQL"]
         ] } },
-        { p: "**This is the single most expensive LINQ mistake:**" },
-        { code: `// BAD: AsEnumerable/ToList switches to LINQ to Objects.
-// SELECT * FROM Orders  -- the whole table crosses the wire,
+        { p: "**This is the most costly LINQ mistake:**" },
+        { code: `// BAD: AsEnumerable() switches to in-memory mode.
+// SQL sent: SELECT * FROM Orders  -- the WHOLE table is loaded,
 // then C# filters it in memory.
 var bad = _db.Orders
     .AsEnumerable()
@@ -190,19 +193,19 @@ var bad = _db.Orders
     .Take(10)
     .ToList();
 
-// GOOD: stays IQueryable, so the filter and the paging reach SQL.
-// SELECT TOP 10 * FROM Orders WHERE Total > 1000
+// GOOD: stays IQueryable, so the filter goes into the SQL.
+// SQL sent: SELECT TOP 10 * FROM Orders WHERE Total > 1000
 var good = _db.Orders
     .Where(o => o.Total > 1000)
     .Take(10)
     .ToList();`, lang: "csharp" },
-        { code: `// The same trap hidden in a method signature
+        { code: `// The same mistake hidden in a method's return type
 public IEnumerable<Order> GetOrders() => _db.Orders;   // callers filter in memory
-public IQueryable<Order>  GetOrders() => _db.Orders;   // callers compose into SQL`, lang: "csharp" },
+public IQueryable<Order>  GetOrders() => _db.Orders;   // callers' filters go into SQL`, lang: "csharp" },
         { ul: [
-          "`IQueryable<T>` **derives from** `IEnumerable<T>`, so anything queryable is also enumerable — which is exactly why the mistake is so easy to make.",
-          "Switch to `IEnumerable` deliberately with `AsEnumerable()` when you genuinely need C# the provider cannot translate — but do it **after** filtering and paging, never before.",
-          "Returning `IQueryable` from a repository is powerful but leaks persistence concerns and keeps the `DbContext` lifetime in play. Returning `IEnumerable` or a materialised list is safer; teams differ on this and either answer is defensible if you can explain the trade-off."
+          "`IQueryable<T>` **inherits from** `IEnumerable<T>`. That is why the mistake is so easy — the code compiles either way.",
+          "Use `AsEnumerable()` only when you really need C# code that SQL cannot do — and do it **after** filtering and paging, not before.",
+          "Should a repository return `IQueryable`? It is flexible, but it lets database details leak out to callers. Returning a list is safer. Both answers are fine in an interview if you explain why."
         ] }
       ]
     },
@@ -210,9 +213,10 @@ public IQueryable<Order>  GetOrders() => _db.Orders;   // callers compose into S
     {
       id: "join",
       q: "How can you use LINQ to join two collections? Provide an example using Join.",
-      tldr: "Join takes both sequences, a key selector for each, and a result selector — producing an inner join; GroupJoin plus DefaultIfEmpty gives a left outer join.",
+      tldr: "Join matches items from two lists using a common key, like CustomerId — just like an INNER JOIN in SQL. For a LEFT JOIN, use GroupJoin with DefaultIfEmpty.",
       tags: ["operators", "joins"],
       a: [
+        { p: "`Join` needs four things: **the other list**, **the key from the first list**, **the key from the second list**, and **what to return** when they match." },
         { code: `var customers = new[]
 {
     new Customer { Id = 1, Name = "Ada" },
@@ -227,19 +231,19 @@ var orders = new[]
     new Order { Id = 12, CustomerId = 2, Total = 75m }
 };
 
-// INNER JOIN — Cleo is excluded
+// INNER JOIN — Cleo is left out because she has no orders
 var joined = customers.Join(
-    orders,                          // inner sequence
-    c => c.Id,                       // outer key
-    o => o.CustomerId,               // inner key
-    (c, o) => new { c.Name, o.Id, o.Total });   // result
+    orders,                          // 1. the other list
+    c => c.Id,                       // 2. key from customers
+    o => o.CustomerId,               // 3. key from orders
+    (c, o) => new { c.Name, o.Id, o.Total });   // 4. what to return
 
 // Ada 10 100 / Ada 11 250 / Brian 12 75`, lang: "csharp" },
-        { code: `// Query syntax — usually more readable for joins
+        { code: `// Query syntax — usually easier to read for joins
 var joined2 = from c in customers
               join o in orders on c.Id equals o.CustomerId
               select new { c.Name, o.Id, o.Total };`, lang: "csharp" },
-        { code: `// LEFT OUTER JOIN — GroupJoin + SelectMany + DefaultIfEmpty
+        { code: `// LEFT JOIN — keep every customer, even with no orders
 var left = from c in customers
            join o in orders on c.Id equals o.CustomerId into customerOrders
            from o in customerOrders.DefaultIfEmpty()
@@ -251,23 +255,23 @@ var left = from c in customers
            };
 
 // Ada 10 100 / Ada 11 250 / Brian 12 75 / Cleo null 0`, lang: "csharp" },
-        { code: `// GROUP JOIN — one row per customer, with their orders nested
+        { code: `// GROUP JOIN — one row per customer, with their orders grouped together
 var grouped = customers.GroupJoin(
     orders,
     c => c.Id,
     o => o.CustomerId,
     (c, os) => new { c.Name, Count = os.Count(), Total = os.Sum(x => x.Total) });
 
-// Composite key — use an anonymous type on both sides
+// Joining on two columns — use new { } on both sides
 var composite = from a in listA
                 join b in listB
                   on new { a.Year, a.Code } equals new { b.Year, b.Code }
                 select new { a, b };`, lang: "csharp" },
         { ul: [
-          "`Join` is an **equijoin only** — the `on ... equals ...` form cannot express `>` or `<`. For those, use a `where` across two `from` clauses (a cross join filtered down).",
-          "`GroupJoin` (`join ... into`) is the hierarchical version: one result per outer element, with the matches grouped.",
-          "**With EF you rarely write `Join` at all** — navigation properties are clearer and generate the same SQL: `_db.Orders.Select(o => new { o.Customer.Name, o.Total })`.",
-          "Composite keys work by comparing **anonymous types**, which have structural equality. The property names must match on both sides."
+          "`Join` only works with **equals** — you cannot join on `>` or `<`. For that, use two `from` clauses with a `where`.",
+          "`GroupJoin` (`join ... into`) gives **one result per customer**, with all their matching orders grouped together.",
+          "**With Entity Framework you rarely need `Join`** — navigation properties are simpler and produce the same SQL: `_db.Orders.Select(o => new { o.Customer.Name, o.Total })`.",
+          "For a two-column join, the property names inside `new { }` **must be the same** on both sides, or it will not compile."
         ] }
       ]
     },
@@ -275,57 +279,58 @@ var composite = from a in listA
     {
       id: "query-vs-method-syntax",
       q: "What are LINQ query syntax and method syntax? Provide examples of both.",
-      tldr: "Query syntax is the SQL-like from/where/select form; method syntax is extension-method chaining. The compiler rewrites query syntax into method calls, so they are identical.",
+      tldr: "Query syntax looks like SQL (from, where, select). Method syntax uses dot-chained methods (.Where().Select()). The compiler turns query syntax into method syntax, so both work exactly the same.",
       tags: ["fundamentals", "syntax"],
       seeAlso: ["linq/what-is-linq"],
       a: [
         { code: `var products = new List<Product>();
 
-// QUERY SYNTAX
+// QUERY SYNTAX — looks like SQL
 var q1 = from p in products
          where p.Price > 100
          orderby p.Name
          select new { p.Name, p.Price };
 
-// METHOD SYNTAX — what the compiler produces from the above
+// METHOD SYNTAX — the compiler converts the above into this
 var q2 = products
          .Where(p => p.Price > 100)
          .OrderBy(p => p.Name)
          .Select(p => new { p.Name, p.Price });`, lang: "csharp" },
         { table: { head: ["", "Query syntax", "Method syntax"], rows: [
-          ["Reads better for", "`join`, `group by`, `let`, multiple `from`", "Simple filters and projections, long chains"],
-          ["Operator coverage", "A subset — no `Count`, `Any`, `First`, `Skip`, `Take`", "**All** operators"],
-          ["Intermediate variables", "`let` clause", "Extra `Select` or a lambda block"],
-          ["Ending", "Must end with `select` or `group`", "Any operator"],
-          ["Mixing", "Wrap in parentheses and chain", "Native"]
+          ["Easier to read for", "`join`, `group by`, `let`, multiple `from`", "Simple filters and long chains"],
+          ["Operators available", "Only some — no `Count`, `Any`, `First`, `Skip`, `Take`", "**All** of them"],
+          ["Storing a temporary value", "`let` keyword", "An extra `Select`"],
+          ["Must end with", "`select` or `group`", "Anything"],
+          ["Mixing both", "Wrap in brackets, then add methods", "Works naturally"]
         ] } },
-        { code: `// Query syntax shines with let, join and group
+        { code: `// Query syntax is nicer with let, join and group
 var report = from o in orders
              join c in customers on o.CustomerId equals c.Id
-             let tax = o.Total * 0.2m                 // a named intermediate
+             let tax = o.Total * 0.2m                 // a temporary value
              where tax > 10
              group new { o, tax } by c.Name into g
              orderby g.Key
              select new { Customer = g.Key, Tax = g.Sum(x => x.tax) };
 
-// Some operators only exist in method syntax, so you mix
+// Some operators exist only in method syntax, so you mix them
 var count = (from p in products where p.Price > 100 select p).Count();
 
-// The equivalent method-syntax "let" is clumsier
+// The same "let" in method syntax is harder to read
 var report2 = orders
     .Join(customers, o => o.CustomerId, c => c.Id, (o, c) => new { o, c })
     .Select(x => new { x.o, x.c, tax = x.o.Total * 0.2m })
     .Where(x => x.tax > 10);`, lang: "csharp" },
-        { note: "They compile to the same IL, so there is no performance difference. The convention most teams settle on: method syntax by default, query syntax when there is a join, a `group by` or a `let` — because that is where it genuinely reads better.", kind: "tip" }
+        { note: "There is **no performance difference** — both become the same code. What most teams do: use method syntax normally, and switch to query syntax when there is a `join`, `group by` or `let`, because that is where it is easier to read.", kind: "tip" }
       ]
     },
 
     {
       id: "group-by",
       q: "How do you perform a group by operation in LINQ? Provide an example.",
-      tldr: "GroupBy takes a key selector and returns a sequence of IGrouping<TKey, TElement> — each group exposes its Key and is itself enumerable.",
+      tldr: "GroupBy puts items with the same key into groups. Each group has a Key (the shared value) and the list of items in that group.",
       tags: ["operators", "grouping"],
       a: [
+        { p: "Example: group orders by customer. You get one group per customer. `g.Key` is the customer ID, and the group itself holds that customer's orders — so you can count, sum, etc." },
         { code: `var orders = new List<Order>();
 
 // Method syntax
@@ -333,7 +338,7 @@ var byCustomer = orders
     .GroupBy(o => o.CustomerId)
     .Select(g => new
     {
-        CustomerId = g.Key,
+        CustomerId = g.Key,                  // the value we grouped by
         Count      = g.Count(),
         Total      = g.Sum(o => o.Total),
         Largest    = g.Max(o => o.Total),
@@ -347,30 +352,30 @@ var byCustomer2 = from o in orders
                   group o by o.CustomerId into g
                   orderby g.Sum(x => x.Total) descending
                   select new { CustomerId = g.Key, Total = g.Sum(x => x.Total) };`, lang: "csharp" },
-        { code: `// Iterating the groups directly
+        { code: `// Looping through the groups
 foreach (var group in orders.GroupBy(o => o.Status))
 {
     Console.WriteLine($"{group.Key}: {group.Count()}");
-    foreach (var order in group)          // IGrouping<TKey,T> IS IEnumerable<T>
+    foreach (var order in group)          // a group is also a list you can loop over
         Console.WriteLine("   " + order.Reference);
 }`, lang: "csharp" },
-        { code: `// Composite key — an anonymous type
+        { code: `// Group by two values — use new { }
 var byMonth = orders.GroupBy(o => new { o.CreatedOn.Year, o.CreatedOn.Month })
                     .Select(g => new { g.Key.Year, g.Key.Month,
                                        Total = g.Sum(o => o.Total) });
 
-// Element selector: group by one thing, collect another
+// Group by one thing, but keep only another value in each group
 var refsByStatus = orders.GroupBy(o => o.Status, o => o.Reference);
-// g.Key = Status, and the group contains strings, not Orders
+// g.Key = Status, and each group holds strings, not Orders
 
-// ToLookup: the IMMEDIATE version of GroupBy
+// ToLookup: like GroupBy, but runs immediately
 var lookup = orders.ToLookup(o => o.CustomerId);
-var adasOrders = lookup[1];               // never null — empty if no match`, lang: "csharp" },
+var adasOrders = lookup[1];               // never null — empty if not found`, lang: "csharp" },
         { ul: [
-          "`IGrouping<TKey, TElement>` **is** an `IEnumerable<TElement>` with an added `Key`.",
-          "**`GroupBy` is deferred; `ToLookup` is immediate.** A lookup returns an empty sequence for a missing key rather than throwing, unlike a dictionary.",
-          "For **LINQ to Objects**, `GroupBy` preserves the order in which keys were first encountered.",
-          "Against **EF**, a `GroupBy` that only produces aggregates translates to SQL `GROUP BY`. One that needs the full grouped rows often cannot be translated and falls back to client evaluation — check the generated SQL."
+          "Each group is an `IGrouping<TKey, TElement>` — basically **a list with a `Key`**.",
+          "**`GroupBy` is deferred; `ToLookup` runs immediately.** A lookup gives you an empty list for a missing key instead of throwing an error like a dictionary does.",
+          "On a normal list, groups come out **in the order their keys first appear**.",
+          "With **Entity Framework**, a `GroupBy` that only returns totals (Count, Sum…) becomes SQL `GROUP BY`. If you need the full rows of each group, EF may not be able to translate it — check the SQL."
         ] }
       ]
     },
@@ -378,17 +383,18 @@ var adasOrders = lookup[1];               // never null — empty if no match`, 
     {
       id: "projection",
       q: "Explain the concept of projection in LINQ. How do you use the Select operator for projection?",
-      tldr: "Projection transforms each element into a new shape — Select maps a source element to a different type, anonymous type or computed value.",
+      tldr: "Projection means changing each item into a new shape — for example, picking only a few properties or building a DTO. In LINQ, you do this with Select.",
       tags: ["operators", "projection"],
       seeAlso: ["linq/select-vs-selectmany"],
       a: [
-        { code: `// Single property
+        { p: "Simple way to say it: you have a `Product` with 20 properties, but you only need `Name` and `Price`. `Select` lets you **pick just what you need** or **turn it into something else**." },
+        { code: `// Just one property
 IEnumerable<string> names = products.Select(p => p.Name);
 
-// Anonymous type — a shape that exists only here
+// Anonymous type — a quick shape used only in this method
 var summary = products.Select(p => new { p.Name, p.Price });
 
-// Named DTO — use this when it crosses a method or API boundary
+// A named DTO class — use this when returning from a method or API
 var dtos = products.Select(p => new ProductDto
 {
     Id = p.Id,
@@ -397,26 +403,26 @@ var dtos = products.Select(p => new ProductDto
     InStock = p.Stock > 0
 });
 
-// Computed values
+// A calculated value
 var withTax = products.Select(p => p.Price * 1.2m);
 
-// The index overload — LINQ to Objects only
+// With the item's position (index) — works on lists only, not EF
 var numbered = products.Select((p, i) => $"{i + 1}. {p.Name}");
 
 // Query syntax
 var summary2 = from p in products select new { p.Name, p.Price };`, lang: "csharp" },
-        { p: "**Why projection matters most against a database** — it controls what actually gets selected:" },
-        { code: `// Loads every column of every row, then throws most of it away
+        { p: "**Why this matters a lot with a database** — `Select` decides which columns are fetched:" },
+        { code: `// BAD: loads ALL columns of ALL rows, then keeps only two
 var bad = _db.Products.ToList().Select(p => new { p.Name, p.Price });
 
-// SELECT Name, Price FROM Products  -- only what is needed
+// GOOD: SQL sent is SELECT Name, Price FROM Products
 var good = _db.Products.Select(p => new { p.Name, p.Price }).ToList();`, lang: "csharp" },
         { ul: [
-          "**Project before materialising.** Calling `ToList()` first turns the projection into an in-memory operation over data you already over-fetched.",
-          "Projection also **avoids circular references and lazy-loading surprises** when serialising, which is why API endpoints should return DTOs rather than entities.",
-          "**Anonymous types** cannot leave the method — they have no name. Use a named DTO or record if the shape crosses a boundary.",
-          "`Select` maps one-to-one; **`SelectMany`** flattens one-to-many.",
-          "Related: `Cast<T>()` and `OfType<T>()` project by type, and `Zip` projects two sequences pairwise."
+          "**Call `Select` before `ToList()`.** If you call `ToList()` first, you have already loaded everything from the database.",
+          "Returning DTOs instead of full entities from an API also **avoids serialization problems** like circular references.",
+          "**Anonymous types cannot be returned from a method** because they have no name. Use a DTO class or record instead.",
+          "`Select` = one item → one result. **`SelectMany`** = one item → many results, flattened into one list.",
+          "Related: `Cast<T>()` and `OfType<T>()` change the type, and `Zip` combines two lists item by item."
         ] }
       ]
     },
@@ -424,33 +430,33 @@ var good = _db.Products.Select(p => new { p.Name, p.Price }).ToList();`, lang: "
     {
       id: "aggregation",
       q: "How can you perform an aggregation operation using LINQ, such as Sum, Count, or Average?",
-      tldr: "Aggregate operators reduce a sequence to a single value and execute immediately — Count, Sum, Average, Min, Max, and Aggregate for anything custom.",
+      tldr: "Aggregation methods turn a whole list into one value — Count, Sum, Average, Min and Max. They run immediately, and Aggregate lets you write your own custom calculation.",
       tags: ["operators", "aggregation"],
       a: [
-        { table: { head: ["Operator", "Returns", "Empty sequence"], rows: [
-          ["`Count()` / `LongCount()`", "Number of elements", "0"],
-          ["`Sum()`", "Total", "0"],
-          ["`Average()`", "Mean", "**Throws** `InvalidOperationException`"],
-          ["`Min()` / `Max()`", "Smallest / largest", "**Throws** for value types, `null` for nullables"],
-          ["`Aggregate()`", "A custom fold", "Throws without a seed"],
-          ["`Any()` / `All()`", "`bool`", "`false` / **`true`**"]
+        { table: { head: ["Method", "Returns", "If the list is empty"], rows: [
+          ["`Count()` / `LongCount()`", "How many items", "0"],
+          ["`Sum()`", "The total", "0"],
+          ["`Average()`", "The average", "**Throws an error**"],
+          ["`Min()` / `Max()`", "Smallest / largest", "**Throws an error** for `int`, `decimal` etc. Returns `null` for nullable types"],
+          ["`Aggregate()`", "Your own custom result", "Throws, unless you give a starting value"],
+          ["`Any()` / `All()`", "`true` or `false`", "`false` / **`true`**"]
         ] } },
         { code: `var orders = new List<Order>();
 
 int count      = orders.Count();
-int shipped    = orders.Count(o => o.Status == Status.Shipped);   // with predicate
+int shipped    = orders.Count(o => o.Status == Status.Shipped);   // count with a condition
 decimal total  = orders.Sum(o => o.Total);
 decimal mean   = orders.Average(o => o.Total);
 decimal biggest = orders.Max(o => o.Total);
 DateTime first = orders.Min(o => o.CreatedOn);
 
-// MaxBy/MinBy (.NET 6+) return the ELEMENT, not the value
+// MaxBy/MinBy (.NET 6+) return the whole ORDER, not just the number
 Order largest = orders.MaxBy(o => o.Total);
 
-// Existence checks — cheaper than counting
+// Yes/no checks — faster than counting
 bool anyLate = orders.Any(o => o.DueDate < DateTime.Today);
 bool allPaid = orders.All(o => o.IsPaid);`, lang: "csharp" },
-        { code: `// Several aggregates in ONE pass, grouped
+        { code: `// Totals per customer, using GroupBy
 var stats = orders
     .GroupBy(o => o.CustomerId)
     .Select(g => new
@@ -461,19 +467,19 @@ var stats = orders
         Average = g.Average(o => o.Total)
     });
 
-// Aggregate: a custom fold with a seed
+// Aggregate: your own calculation, with a starting value
 var csv = names.Aggregate(
-    new StringBuilder(),
-    (sb, n) => sb.Length == 0 ? sb.Append(n) : sb.Append(", ").Append(n),
-    sb => sb.ToString());
+    new StringBuilder(),                                                  // start with an empty builder
+    (sb, n) => sb.Length == 0 ? sb.Append(n) : sb.Append(", ").Append(n), // add each name
+    sb => sb.ToString());                                                 // final result
 
 var runningMax = numbers.Aggregate(0, (max, n) => n > max ? n : max);`, lang: "csharp" },
         { ul: [
-          "**Empty-sequence behaviour is the trap.** `Average()` and `Min()`/`Max()` on value types throw; `Sum()` and `Count()` return 0. Guard with `Any()`, or project to a nullable: `orders.Average(o => (decimal?)o.Total)` returns `null` instead of throwing.",
-          "**Use `Any()` rather than `Count() > 0`** — `Any` short-circuits at the first element, `Count` enumerates everything.",
-          "All aggregates are **immediate** — they force execution.",
-          "Against **EF** these translate to SQL `COUNT`, `SUM`, `AVG` and run in the database — but only if the sequence is still `IQueryable`.",
-          "Prefer **`MaxBy`/`MinBy`** over `OrderByDescending(...).First()` — one pass instead of a full sort."
+          "**Watch out for empty lists.** `Average()`, `Min()` and `Max()` throw an error on an empty list, but `Sum()` and `Count()` return 0. To be safe, check `Any()` first, or cast to nullable: `orders.Average(o => (decimal?)o.Total)` returns `null` instead of crashing.",
+          "**Use `Any()` instead of `Count() > 0`** — `Any` stops at the first item, `Count` checks all of them.",
+          "All these methods **run immediately** — they are not deferred.",
+          "With **Entity Framework**, they become SQL `COUNT`, `SUM`, `AVG` and run in the database — as long as you have not called `ToList()` before them.",
+          "Use **`MaxBy`/`MinBy`** instead of `OrderByDescending(...).First()` — it just scans once instead of sorting the whole list."
         ] }
       ]
     }
