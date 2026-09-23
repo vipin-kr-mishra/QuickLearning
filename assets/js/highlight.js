@@ -40,6 +40,8 @@
   /* Shared fragments ------------------------------------------------------ */
   var CS_KEY = /\b(?:abstract|as|async|await|base|bool|break|byte|case|catch|char|checked|class|const|continue|decimal|default|delegate|do|double|dynamic|else|enum|event|explicit|extern|false|file|finally|fixed|float|for|foreach|get|global|goto|if|implicit|in|init|int|interface|internal|is|lock|long|nameof|namespace|new|not|null|object|operator|out|override|params|partial|private|protected|public|readonly|record|ref|required|return|sbyte|scoped|sealed|set|short|sizeof|stackalloc|static|string|struct|switch|this|throw|true|try|typeof|uint|ulong|unchecked|unsafe|ushort|using|value|var|virtual|void|volatile|when|where|while|with|yield)\b/;
 
+  var TS_KEY = /\b(?:abstract|any|as|asserts|async|await|bigint|boolean|break|case|catch|class|const|constructor|continue|declare|default|delete|do|else|enum|export|extends|false|finally|for|from|function|get|if|implements|import|in|infer|instanceof|interface|is|keyof|let|namespace|never|new|null|number|object|of|private|protected|public|readonly|return|satisfies|set|static|string|super|switch|symbol|this|throw|true|try|type|typeof|undefined|unknown|var|void|while|yield)\b/;
+
   var CS_COMMENT = /\/\/[^\n]*|\/\*[\s\S]*?\*\//;
   var CS_STRING  = /\$?@"(?:[^"]|"")*"|\$?"(?:\\.|[^"\\\n])*"/;
   var CS_CHAR    = /'(?:\\.|[^'\\])'/;
@@ -96,10 +98,20 @@
       { cls: "t-key", re: /^[ \t]*(?:dotnet|npm|npx|node|git|cd|nuget|Install-Package|Update-Database|Add-Migration)\b/ }
     ]),
 
+    typescript: build([
+      { cls: "t-com",  re: CS_COMMENT },
+      { cls: "t-str",  re: /"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'|`[^`]*`/ },
+      { cls: "t-attr", re: /@[A-Za-z_]\w*/ },
+      { cls: "t-num",  re: NUMBER },
+      { cls: "t-key",  re: TS_KEY },
+      { cls: "t-type", re: /\b[A-Z][A-Za-z0-9_]*\b(?!\s*\()/ }
+    ]),
+
     text: function (code) { return esc(code); }
   };
 
   HL.cs = HL.csharp;
+  HL.ts = HL.typescript;
   HL.cshtml = HL.razor;
   HL.html = HL.xml;
   HL.config = HL.xml;

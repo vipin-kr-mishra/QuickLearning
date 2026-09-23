@@ -108,6 +108,7 @@
 [data-accent="violet"] { --tone: var(--violet); --tone-soft: var(--violet-soft); }
 [data-accent="blue"]   { --tone: var(--blue);   --tone-soft: var(--blue-soft); }
 [data-accent="teal"]   { --tone: var(--teal);   --tone-soft: var(--teal-soft); }
+[data-accent="sky"]    { --tone: var(--sky);    --tone-soft: var(--sky-soft); }
 
 /* ===== Search box ===== */
 .searchbox {
