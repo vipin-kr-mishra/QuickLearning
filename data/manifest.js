@@ -23,7 +23,7 @@
           { note: "An aside.", kind: "tip" }        // kind: "tip" (default) or "warn"
           { table: { head: ["A", "B"], rows: [["1", "2"], ["3", "4"]] } }
 
-        lang can be: csharp, razor, xml, json, sql, bash, text.
+        lang can be: csharp, typescript, razor, xml, json, sql, bash, text.
 
    AUTHORING RULES (these keep escaping from ever biting)
      - Prose strings use DOUBLE quotes, so they can contain `backticks`.
@@ -58,6 +58,12 @@
       title: "LINQ",
       accent: "teal",
       sections: ["linq"]
+    },
+    {
+      id: "typescript",
+      title: "TypeScript",
+      accent: "sky",
+      sections: ["typescript-basic", "typescript-intermediate"]
     }
   ];
 })();

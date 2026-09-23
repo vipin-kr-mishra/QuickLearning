@@ -146,7 +146,7 @@
 
     var html = '<section class="home-hero">' +
       '<h1 class="home-hero__title">Interview quick reference</h1>' +
-      '<p class="home-hero__lead">' + all.total + " questions with interview-ready answers across C#, ASP.NET MVC and LINQ. " +
+      '<p class="home-hero__lead">' + all.total + " questions with interview-ready answers across C#, ASP.NET MVC, LINQ and TypeScript. " +
         "Search from anywhere, star what matters, and tick things off as you learn them.</p>" +
       '<div class="home-hero__stats">' +
         '<div class="stat"><div class="stat__value">' + all.total + '</div><div class="stat__label">Questions</div></div>' +

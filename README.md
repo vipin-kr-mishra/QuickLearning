@@ -1,6 +1,6 @@
 # QuickLearning
 
-A fast, searchable reference of **C#**, **ASP.NET MVC** and **LINQ** interview questions with
+A fast, searchable reference of **C#**, **ASP.NET MVC**, **LINQ** and **TypeScript** interview questions with
 interview-ready answers — built for a quick scan before an interview or during revision.
 
 **Live:** https://vipin-kr-mishra.github.io/QuickLearning/
@@ -21,10 +21,12 @@ folder over HTTP — both work identically.
 | ASP.NET MVC — Intermediate | 30 |
 | ASP.NET MVC — Advanced | 30 |
 | LINQ | 10 |
-| **Total** | **192** |
+| TypeScript — Basic | 30 |
+| TypeScript — Intermediate | 30 |
+| **Total** | **252** |
 
 Every answer follows the same shape: a one-line **In short** summary you could say out loud,
-then the detail, with a C# snippet wherever code makes it clearer.
+then the detail, with a C# or TypeScript snippet wherever code makes it clearer.
 
 MVC answers target classic **ASP.NET MVC 5** — which is what these questions describe — and note
 the **ASP.NET Core** equivalent wherever the two differ.
