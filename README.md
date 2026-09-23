@@ -94,6 +94,11 @@ Two authoring rules keep escaping from ever biting:
 2. Add a `<script src="data/<your-topic>.js"></script>` line to `index.html`, before `assets/js/app.js`.
 3. Add the section id to a group in `QL.groups` in `data/manifest.js`.
 
+### Cache busting
+
+Every CSS and JS link in `index.html` ends in `?v=N`. After changing any of those files, bump `N`
+(one find-and-replace) so browsers fetch the new files instead of serving a stale cached copy.
+
 `data/manifest.js` carries the same guide as a header comment, next to the code.
 
 ## Structure
