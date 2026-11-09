@@ -1,6 +1,6 @@
 # QuickLearning
 
-A fast, searchable reference of **C#**, **ASP.NET MVC**, **LINQ** and **TypeScript** interview questions with
+A fast, searchable reference of **C#**, **ASP.NET MVC**, **LINQ**, **TypeScript** and **GraphQL** interview questions with
 interview-ready answers — built for a quick scan before an interview or during revision.
 
 **Live:** https://vipin-kr-mishra.github.io/QuickLearning/
@@ -23,13 +23,18 @@ folder over HTTP — both work identically.
 | LINQ | 10 |
 | TypeScript — Basic | 30 |
 | TypeScript — Intermediate | 30 |
-| **Total** | **252** |
+| GraphQL — Basic | 30 |
+| GraphQL — Intermediate | 30 |
+| **Total** | **312** |
 
 Every answer follows the same shape: a one-line **In short** summary you could say out loud,
-then the detail, with a C# or TypeScript snippet wherever code makes it clearer.
+then the detail, with a C#, TypeScript or GraphQL snippet wherever code makes it clearer.
 
 MVC answers target classic **ASP.NET MVC 5** — which is what these questions describe — and note
 the **ASP.NET Core** equivalent wherever the two differ.
+
+GraphQL answers show schema and query syntax in GraphQL itself, and server and client code in
+TypeScript with **Apollo Server** and **Apollo Client**.
 
 ## Features
 
@@ -87,6 +92,8 @@ Two authoring rules keep escaping from ever biting:
 - Prose strings use **double quotes**, so they can contain `` `backticks` `` for inline code.
 - `code` values use **template literals**, because C# contains no backticks. Inside one, never
   write a backslash or the sequence dollar-brace — JavaScript would interpret them.
+- The one exception: TypeScript that has its own template string (Apollo's `` gql`...` `` tag, for
+  example) writes each of those backticks as `` \` `` so the outer literal does not end early.
 
 ### Adding a whole new topic
 
