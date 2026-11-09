@@ -38,6 +38,8 @@
   --teal-soft:     #ccfbf1;
   --sky:           #0369a1;
   --sky-soft:      #e0f2fe;
+  --pink:          #c11c84;
+  --pink-soft:     #fce7f3;
 
   /* Levels */
   --lvl-basic:      #15803d;
@@ -123,6 +125,8 @@
     --teal-soft:     #0a2f2c;
     --sky:           #38bdf8;
     --sky-soft:      #0b2a3d;
+    --pink:          #f472b6;
+    --pink-soft:     #3b1030;
 
     --lvl-basic:      #4ade80;
     --lvl-basic-soft: #0d2b1a;
@@ -187,6 +191,8 @@
   --teal-soft:     #0a2f2c;
   --sky:           #38bdf8;
   --sky-soft:      #0b2a3d;
+  --pink:          #f472b6;
+  --pink-soft:     #3b1030;
 
   --lvl-basic:      #4ade80;
   --lvl-basic-soft: #0d2b1a;

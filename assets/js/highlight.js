@@ -107,11 +107,25 @@
       { cls: "t-type", re: /\b[A-Z][A-Za-z0-9_]*\b(?!\s*\()/ }
     ]),
 
+    graphql: build([
+      { cls: "t-com",  re: /#[^\n]*/ },
+      { cls: "t-str",  re: /"""[\s\S]*?"""|"(?:\\.|[^"\\\n])*"/ },
+      { cls: "t-num",  re: /\$[A-Za-z_]\w*/ },
+      { cls: "t-attr", re: /@[A-Za-z_]\w*/ },
+      // Definition keywords count only at the start of a line, and never before
+      // a colon, so an argument named "input" is not coloured as a keyword.
+      { cls: "t-key",  re: /^[ \t]*(?:extend[ \t]+)?(?:schema|scalar|type|interface|union|enum|input|directive)\b(?!\s*:)/ },
+      { cls: "t-key",  re: /\b(?:query|mutation|subscription|fragment|on|implements|repeatable|true|false|null)\b(?!\s*:)/ },
+      { cls: "t-num",  re: NUMBER },
+      { cls: "t-type", re: /\b[A-Z][A-Za-z0-9_]*\b/ }
+    ]),
+
     text: function (code) { return esc(code); }
   };
 
   HL.cs = HL.csharp;
   HL.ts = HL.typescript;
+  HL.gql = HL.graphql;
   HL.cshtml = HL.razor;
   HL.html = HL.xml;
   HL.config = HL.xml;
