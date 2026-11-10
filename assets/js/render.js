@@ -66,7 +66,8 @@
     var lang = b.lang || "csharp";
     var label = { csharp: "C#", cs: "C#", razor: "Razor", cshtml: "Razor", xml: "XML",
                   config: "Config", json: "JSON", sql: "SQL", bash: "Shell", text: "Text",
-                  typescript: "TypeScript", ts: "TypeScript" }[lang] || lang;
+                  typescript: "TypeScript", ts: "TypeScript",
+                  graphql: "GraphQL", gql: "GraphQL" }[lang] || lang;
     return '<div class="codeblock">' +
       '<div class="codeblock__bar">' +
         '<span class="codeblock__lang">' + esc(label) + "</span>" +
