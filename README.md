@@ -1,7 +1,7 @@
 # QuickLearning
 
-A fast, searchable reference of **C#**, **ASP.NET MVC**, **LINQ**, **TypeScript** and **GraphQL** interview questions with
-interview-ready answers — built for a quick scan before an interview or during revision.
+A fast, searchable reference of **C#**, **ASP.NET MVC**, **LINQ**, **TypeScript**, **GraphQL** and **Python** interview
+questions with interview-ready answers — built for a quick scan before an interview or during revision.
 
 **Live:** https://vipin-kr-mishra.github.io/QuickLearning/
 
@@ -25,16 +25,22 @@ folder over HTTP — both work identically.
 | TypeScript — Intermediate | 30 |
 | GraphQL — Basic | 30 |
 | GraphQL — Intermediate | 30 |
-| **Total** | **312** |
+| Python — Basic | 30 |
+| Python — Intermediate | 30 |
+| Python — Advanced | 30 |
+| **Total** | **402** |
 
 Every answer follows the same shape: a one-line **In short** summary you could say out loud,
-then the detail, with a C#, TypeScript or GraphQL snippet wherever code makes it clearer.
+then the detail, with a C#, TypeScript, GraphQL or Python snippet wherever code makes it clearer.
 
 MVC answers target classic **ASP.NET MVC 5** — which is what these questions describe — and note
 the **ASP.NET Core** equivalent wherever the two differ.
 
 GraphQL answers show schema and query syntax in GraphQL itself, and server and client code in
 TypeScript with **Apollo Server** and **Apollo Client**.
+
+Python answers cover the language itself and its standard library on modern **Python 3**, and say
+which version a feature arrived in (`match` in 3.10, the generics syntax in 3.12, and so on).
 
 ## Features
 
@@ -94,6 +100,8 @@ Two authoring rules keep escaping from ever biting:
   write a backslash or the sequence dollar-brace — JavaScript would interpret them.
 - The one exception: TypeScript that has its own template string (Apollo's `` gql`...` `` tag, for
   example) writes each of those backticks as `` \` `` so the outer literal does not end early.
+- Python has no backticks either, but an escape such as `\n`, a raw string or a regex needs a real
+  backslash. Write it doubled (`\\n`) so that one reaches the page.
 
 ### Adding a whole new topic
 

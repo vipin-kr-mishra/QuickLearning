@@ -67,7 +67,8 @@
     var label = { csharp: "C#", cs: "C#", razor: "Razor", cshtml: "Razor", xml: "XML",
                   config: "Config", json: "JSON", sql: "SQL", bash: "Shell", text: "Text",
                   typescript: "TypeScript", ts: "TypeScript",
-                  graphql: "GraphQL", gql: "GraphQL" }[lang] || lang;
+                  graphql: "GraphQL", gql: "GraphQL",
+                  python: "Python", py: "Python" }[lang] || lang;
     return '<div class="codeblock">' +
       '<div class="codeblock__bar">' +
         '<span class="codeblock__lang">' + esc(label) + "</span>" +
