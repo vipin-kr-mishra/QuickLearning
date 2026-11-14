@@ -42,6 +42,8 @@
 
   var TS_KEY = /\b(?:abstract|any|as|asserts|async|await|bigint|boolean|break|case|catch|class|const|constructor|continue|declare|default|delete|do|else|enum|export|extends|false|finally|for|from|function|get|if|implements|import|in|infer|instanceof|interface|is|keyof|let|namespace|never|new|null|number|object|of|private|protected|public|readonly|return|satisfies|set|static|string|super|switch|symbol|this|throw|true|try|type|typeof|undefined|unknown|var|void|while|yield)\b/;
 
+  var PY_KEY = /\b(?:False|None|True|and|as|assert|async|await|break|class|continue|def|del|elif|else|except|finally|for|from|global|if|import|in|is|lambda|nonlocal|not|or|pass|raise|return|try|while|with|yield)\b/;
+
   var CS_COMMENT = /\/\/[^\n]*|\/\*[\s\S]*?\*\//;
   var CS_STRING  = /\$?@"(?:[^"]|"")*"|\$?"(?:\\.|[^"\\\n])*"/;
   var CS_CHAR    = /'(?:\\.|[^'\\])'/;
@@ -95,7 +97,7 @@
     bash: build([
       { cls: "t-com", re: /#[^\n]*/ },
       { cls: "t-str", re: /"(?:\\.|[^"\\])*"|'[^']*'/ },
-      { cls: "t-key", re: /^[ \t]*(?:dotnet|npm|npx|node|git|cd|nuget|Install-Package|Update-Database|Add-Migration)\b/ }
+      { cls: "t-key", re: /^[ \t]*(?:dotnet|npm|npx|node|git|cd|nuget|python3?|py-spy|py|pip3?|pytest|uv|Install-Package|Update-Database|Add-Migration)\b/ }
     ]),
 
     typescript: build([
@@ -120,12 +122,34 @@
       { cls: "t-type", re: /\b[A-Z][A-Za-z0-9_]*\b/ }
     ]),
 
+    python: build([
+      { cls: "t-com",  re: /#[^\n]*/ },
+      // An optional prefix (f, r, b, u, t, or a pair such as rb), then a
+      // triple-quoted string or a single-line one.
+      { cls: "t-str",  re: /(?:\b[rRbBfFuUtT]{1,2})?(?:"""[\s\S]*?"""|'''[\s\S]*?'''|"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*')/ },
+      { cls: "t-attr", re: /^[ \t]*@[A-Za-z_][\w.]*/ },
+      { cls: "t-num",  re: /\b(?:0[xX][0-9a-fA-F_]+|0[bB][01_]+|0[oO][0-7_]+|\d[\d_]*(?:\.\d[\d_]*)?(?:[eE][+-]?\d+)?[jJ]?)\b/ },
+      // Attribute access stays plain, so event.set() or self.list is not
+      // coloured as the built-in type of the same name.
+      { cls: "t-plain", re: /\.[a-z_]\w*/ },
+      // match, case and type are soft keywords: they count only at the start
+      // of a statement, so `match = re.match(...)` and `type(x)` stay plain.
+      { cls: "t-key",  re: /^[ \t]*(?:match|case)(?=[ \t]+[^=\s])/ },
+      { cls: "t-key",  re: /^[ \t]*type(?=[ \t]+[A-Za-z_]\w*[ \t]*(?:\[[^\]\n]*\])?[ \t]*=)/ },
+      { cls: "t-key",  re: PY_KEY },
+      { cls: "t-type", re: /\b(?:int|float|complex|bool|str|bytes|bytearray|list|tuple|dict|set|frozenset|object)\b/ },
+      // PascalCase names are classes, and calling one builds an instance, so
+      // unlike C# they are coloured even when followed by "(".
+      { cls: "t-type", re: /\b[A-Z][A-Za-z0-9_]*\b/ }
+    ]),
+
     text: function (code) { return esc(code); }
   };
 
   HL.cs = HL.csharp;
   HL.ts = HL.typescript;
   HL.gql = HL.graphql;
+  HL.py = HL.python;
   HL.cshtml = HL.razor;
   HL.html = HL.xml;
   HL.config = HL.xml;

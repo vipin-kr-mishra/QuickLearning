@@ -23,7 +23,8 @@
           { note: "An aside.", kind: "tip" }        // kind: "tip" (default) or "warn"
           { table: { head: ["A", "B"], rows: [["1", "2"], ["3", "4"]] } }
 
-        lang can be: csharp, typescript, graphql, razor, xml, json, sql, bash, text.
+        lang can be: csharp, typescript, graphql, python, razor, xml, json, sql,
+        bash, text.
 
    AUTHORING RULES (these keep escaping from ever biting)
      - Prose strings use DOUBLE quotes, so they can contain `backticks`.
@@ -33,6 +34,9 @@
      - The one exception: TypeScript that has its own template string (Apollo's
        gql`...` tag, for example) writes each of those backticks as \` so the
        outer literal does not end early. Still never write dollar-brace.
+     - Python has no backticks either, but an escape such as \n, a raw string
+       or a regex needs a real backslash. Write it doubled (two backslashes)
+       so that one reaches the page.
 
    HOW TO ADD A WHOLE NEW TOPIC
      1. Create data/<your-topic>.js, copying the QL.register({...}) header below.
@@ -73,6 +77,12 @@
       title: "GraphQL",
       accent: "pink",
       sections: ["graphql-basic", "graphql-intermediate"]
+    },
+    {
+      id: "python",
+      title: "Python",
+      accent: "yellow",
+      sections: ["python-basic", "python-intermediate", "python-advanced"]
     }
   ];
 })();
