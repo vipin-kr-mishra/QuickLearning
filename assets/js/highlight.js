@@ -143,6 +143,21 @@
       { cls: "t-type", re: /\b[A-Z][A-Za-z0-9_]*\b/ }
     ]),
 
+    // mongosh is JavaScript, so this also serves plain JavaScript snippets.
+    mongo: build([
+      { cls: "t-com",  re: CS_COMMENT },
+      { cls: "t-str",  re: /"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'|`[^`]*`/ },
+      // A regex literal such as /^ash/i, only where a value can start, so a
+      // division like a / b is never mistaken for one.
+      { cls: "t-str",  re: /(?<=(?:^|[(,:=[!&|?{};]|\breturn)[ \t]*)\/(?![*\/])(?:\\.|\[(?:\\.|[^\]\\\n])*\]|[^\/\\\n[])+\/[gimsuy]*/ },
+      // $match, $set, "$total", $$ROOT: operators and field paths.
+      { cls: "t-attr", re: /\$\$?[A-Za-z_][\w.]*/ },
+      { cls: "t-num",  re: NUMBER },
+      { cls: "t-key",  re: /\b(?:async|await|break|case|catch|class|const|continue|default|delete|do|else|export|false|finally|for|function|if|import|in|instanceof|let|new|null|of|return|switch|this|throw|true|try|typeof|undefined|use|var|while)\b/ },
+      { cls: "t-key",  re: /^[ \t]*(?:show|it|help)\b/ },
+      { cls: "t-type", re: /\b[A-Z][A-Za-z0-9_]*\b/ }
+    ]),
+
     text: function (code) { return esc(code); }
   };
 
@@ -150,6 +165,9 @@
   HL.ts = HL.typescript;
   HL.gql = HL.graphql;
   HL.py = HL.python;
+  HL.mongosh = HL.mongo;
+  HL.javascript = HL.mongo;
+  HL.js = HL.mongo;
   HL.cshtml = HL.razor;
   HL.html = HL.xml;
   HL.config = HL.xml;
