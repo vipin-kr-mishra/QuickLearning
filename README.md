@@ -1,7 +1,7 @@
 # QuickLearning
 
-A fast, searchable reference of **C#**, **ASP.NET MVC**, **LINQ**, **TypeScript**, **GraphQL** and **Python** interview
-questions with interview-ready answers — built for a quick scan before an interview or during revision.
+A fast, searchable reference of **C#**, **ASP.NET MVC**, **LINQ**, **TypeScript**, **GraphQL**, **Python**
+and **MongoDB** interview questions with interview-ready answers — built for a quick scan before an interview or during revision.
 
 **Live:** https://vipin-kr-mishra.github.io/QuickLearning/
 
@@ -28,10 +28,13 @@ folder over HTTP — both work identically.
 | Python — Basic | 30 |
 | Python — Intermediate | 30 |
 | Python — Advanced | 30 |
-| **Total** | **402** |
+| MongoDB — Basic | 30 |
+| MongoDB — Intermediate | 30 |
+| MongoDB — Advanced | 30 |
+| **Total** | **492** |
 
 Every answer follows the same shape: a one-line **In short** summary you could say out loud,
-then the detail, with a C#, TypeScript, GraphQL or Python snippet wherever code makes it clearer.
+then the detail, with a C#, TypeScript, GraphQL, Python or MongoDB snippet wherever code makes it clearer.
 
 MVC answers target classic **ASP.NET MVC 5** — which is what these questions describe — and note
 the **ASP.NET Core** equivalent wherever the two differ.
@@ -41,6 +44,9 @@ TypeScript with **Apollo Server** and **Apollo Client**.
 
 Python answers cover the language itself and its standard library on modern **Python 3**, and say
 which version a feature arrived in (`match` in 3.10, the generics syntax in 3.12, and so on).
+
+MongoDB answers show queries, updates and aggregation pipelines in **mongosh** (shell) syntax, which
+looks the same in every driver, and say which server version a feature arrived in.
 
 ## Features
 
@@ -102,6 +108,8 @@ Two authoring rules keep escaping from ever biting:
   example) writes each of those backticks as `` \` `` so the outer literal does not end early.
 - Python has no backticks either, but an escape such as `\n`, a raw string or a regex needs a real
   backslash. Write it doubled (`\\n`) so that one reaches the page.
+- MongoDB snippets are full of dollar signs (`$match`, `"$total"`), which are fine. Only dollar-brace
+  is a problem, so always leave a space: `{ $sum: 1 }`.
 
 ### Adding a whole new topic
 

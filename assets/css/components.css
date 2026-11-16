@@ -111,6 +111,7 @@
 [data-accent="sky"]    { --tone: var(--sky);    --tone-soft: var(--sky-soft); }
 [data-accent="pink"]   { --tone: var(--pink);   --tone-soft: var(--pink-soft); }
 [data-accent="yellow"] { --tone: var(--yellow); --tone-soft: var(--yellow-soft); }
+[data-accent="green"]  { --tone: var(--green);  --tone-soft: var(--green-soft); }
 
 /* ===== Search box ===== */
 .searchbox {

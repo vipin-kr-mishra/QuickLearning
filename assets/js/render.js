@@ -68,7 +68,9 @@
                   config: "Config", json: "JSON", sql: "SQL", bash: "Shell", text: "Text",
                   typescript: "TypeScript", ts: "TypeScript",
                   graphql: "GraphQL", gql: "GraphQL",
-                  python: "Python", py: "Python" }[lang] || lang;
+                  python: "Python", py: "Python",
+                  mongo: "mongosh", mongosh: "mongosh",
+                  javascript: "JavaScript", js: "JavaScript" }[lang] || lang;
     return '<div class="codeblock">' +
       '<div class="codeblock__bar">' +
         '<span class="codeblock__lang">' + esc(label) + "</span>" +

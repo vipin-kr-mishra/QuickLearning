@@ -23,8 +23,8 @@
           { note: "An aside.", kind: "tip" }        // kind: "tip" (default) or "warn"
           { table: { head: ["A", "B"], rows: [["1", "2"], ["3", "4"]] } }
 
-        lang can be: csharp, typescript, graphql, python, razor, xml, json, sql,
-        bash, text.
+        lang can be: csharp, typescript, graphql, python, mongo (mongosh),
+        javascript, razor, xml, json, sql, bash, text.
 
    AUTHORING RULES (these keep escaping from ever biting)
      - Prose strings use DOUBLE quotes, so they can contain `backticks`.
@@ -37,6 +37,9 @@
      - Python has no backticks either, but an escape such as \n, a raw string
        or a regex needs a real backslash. Write it doubled (two backslashes)
        so that one reaches the page.
+     - MongoDB is full of dollar signs ($match, "$total"), which are fine on
+       their own. Only dollar-brace is a problem, so write { $sum: 1 } with a
+       space after the brace, never the two characters together.
 
    HOW TO ADD A WHOLE NEW TOPIC
      1. Create data/<your-topic>.js, copying the QL.register({...}) header below.
@@ -83,6 +86,12 @@
       title: "Python",
       accent: "yellow",
       sections: ["python-basic", "python-intermediate", "python-advanced"]
+    },
+    {
+      id: "mongodb",
+      title: "MongoDB",
+      accent: "green",
+      sections: ["mongodb-basic", "mongodb-intermediate", "mongodb-advanced"]
     }
   ];
 })();
